@@ -19,7 +19,7 @@ index 9d0c85c..0cce518 100644
  #ifdef DMALLOC
  #include <dmalloc.h>
  #else
-+#if defined darwinPpc || defined darwinIntel
++#if defined darwinPpc || defined darwinIntel || defined darwinIntel64
 +#include <sys/malloc.h>
 +#else
  #include <malloc.h>
@@ -48,7 +48,7 @@ index 0c146e1..ab23bdf 100644
  #ifdef DMALLOC
  #include <dmalloc.h>
  #else
-+#if defined darwinPpc || defined darwinIntel
++#if defined darwinPpc || defined darwinIntel || defined darwinIntel64
 +#include <sys/malloc.h>
 +#else
  #include <malloc.h>
@@ -65,7 +65,7 @@ index f82b0cb..47d24f8 100644
  #ifdef __STDC__
  #include <stdlib.h>
  #else
-+#if defined darwinPpc || defined darwinIntel
++#if defined darwinPpc || defined darwinIntel || defined darwinIntel64
 +#include <sys/malloc.h>
 +#else
  #include <malloc.h>
@@ -82,7 +82,7 @@ index e30f989..59d33ca 100644
  
  #include <stdio.h>
  #include <stdlib.h>
-+#if defined darwinPpc || defined darwinIntel
++#if defined darwinPpc || defined darwinIntel || defined darwinIntel64
 +#include <sys/malloc.h>
 +#else
  #include <malloc.h>

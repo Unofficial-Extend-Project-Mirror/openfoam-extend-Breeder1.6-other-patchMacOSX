@@ -889,7 +889,7 @@ diff --git a/wmake/Makefile b/wmake/Makefile
 index 28b7015..a98f1a9 100644
 --- a/wmake/Makefile
 +++ b/wmake/Makefile
-@@ -93,7 +93,15 @@ EXE_DEP         = $(OBJECTS_DIR)/options
+@@ -93,7 +93,19 @@ EXE_DEP         = $(OBJECTS_DIR)/options
  LIB             = libNULL
  
  # Shared library extension
@@ -899,7 +899,11 @@ index 28b7015..a98f1a9 100644
 +ifeq ($(WM_ARCH),darwinIntel)
 +SO              = dylib
 +else
++ifeq ($(WM_ARCH),darwinIntel64)
++SO              = dylib
++else
  SO              = so
++endif
 +endif
 +endif
  
