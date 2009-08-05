@@ -1,10 +1,10 @@
 diff --git a/.build b/.build
-index 1ce203a..a1fc397 100644
+index 1ce203a..7bf6e81 100644
 --- a/.build
 +++ b/.build
 @@ -1 +1 @@
 -1.6-f802ff2d6c5a
-+1.6-fd413460e215
++1.6-9c385c33a206
 diff --git a/.gitignore b/.gitignore
 index 0639d63..44a6818 100644
 --- a/.gitignore
@@ -459,14 +459,14 @@ index dca96f4..0ee9d6d 100755
          dirList="$dirList $dir"
      fi
 diff --git a/etc/apps/paraview3/bashrc b/etc/apps/paraview3/bashrc
-index 354687e..7401ec7 100644
+index 354687e..585c60a 100644
 --- a/etc/apps/paraview3/bashrc
 +++ b/etc/apps/paraview3/bashrc
 @@ -62,12 +62,31 @@ then
      else
          export PYTHONPATH=$paraviewPython:$ParaView_DIR/lib/$paraviewMajor
      fi
-+    if [ $WM_ARCH == "darwinPpc" -o $WM_ARCH == "darwinIntel"  -o $WM_ARCH == "darwinIntel64" ]       
++    if [ $WM_ARCH_BASE == "darwin" ]
 +    then
 +       export PYTHONPATH=$PYTHONPATH:$ParaView_DIR/bin
 +    fi
@@ -476,7 +476,7 @@ index 354687e..7401ec7 100644
  then
      export PATH=$ParaView_DIR/bin:$PATH
      export PV_PLUGIN_PATH=$FOAM_LIBBIN
-+    if [ $WM_ARCH == "darwinPpc" -o $WM_ARCH == "darwinIntel"  -o $WM_ARCH == "darwinIntel64" ]   
++    if [ $WM_ARCH_BASE == "darwin" ]
 +	then
 +        export PATH=$ParaView_DIR/bin/paraview.app/Contents/MacOS:$PATH
 +	export DYLD_LIBRARY_PATH=$ParaView_DIR/bin:$DYLD_LIBRARY_PATH
@@ -495,14 +495,15 @@ index 354687e..7401ec7 100644
  
  unset cmake paraviewMajor paraviewPython
 diff --git a/etc/bashrc b/etc/bashrc
-index 0c46057..4dde698 100644
+index 0c46057..d62b7e5 100644
 --- a/etc/bashrc
 +++ b/etc/bashrc
-@@ -192,6 +192,45 @@ SunOS)
+@@ -192,6 +192,46 @@ SunOS)
      export WM_MPLIB=FJMPI
      ;;
  
 +Darwin)
++    export WM_ARCH_BASE=darwin
 +    case `uname -p` in
 +    powerpc)
 +	export WM_ARCH=darwinPpc
@@ -544,7 +545,7 @@ index 0c46057..4dde698 100644
  *)    	# an unsupported operating system
      cat <<USAGE
  
-@@ -212,6 +251,10 @@ cleanEnv=`$cleanProg "$PATH" "$foamOldDirs"` && PATH="$cleanEnv"
+@@ -212,6 +252,10 @@ cleanEnv=`$cleanProg "$PATH" "$foamOldDirs"` && PATH="$cleanEnv"
  
  #- Clean LD_LIBRARY_PATH
  cleanEnv=`$cleanProg "$LD_LIBRARY_PATH" "$foamOldDirs"` && LD_LIBRARY_PATH="$cleanEnv"
@@ -569,14 +570,14 @@ index a76ef3c..f012168 100644
      (
          "$WM_PROJECT_USER_DIR/Doxygen/html"
 diff --git a/etc/settings.sh b/etc/settings.sh
-index 9d39e1e..e548e04 100644
+index 9d39e1e..5ce8b04 100644
 --- a/etc/settings.sh
 +++ b/etc/settings.sh
 @@ -47,6 +47,10 @@ _foamAddLib()
      while [ $# -ge 1 ]
      do
          export LD_LIBRARY_PATH=$1:$LD_LIBRARY_PATH
-+	if [ $WM_ARCH == "darwin" ]	    
++	if [ $WM_ARCH_BASE == "darwin" ]	    
 +	then
 +	    export DYLD_LIBRARY_PATH=$1:$DYLD_LIBRARY_PATH
 +	fi
@@ -622,7 +623,7 @@ index c71274d..f75563d 100644
  // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
  
 diff --git a/src/OSspecific/POSIX/printStack.C b/src/OSspecific/POSIX/printStack.C
-index a6c2743..a03472b 100644
+index a6c2743..0114d69 100644
 --- a/src/OSspecific/POSIX/printStack.C
 +++ b/src/OSspecific/POSIX/printStack.C
 @@ -32,8 +32,11 @@ License
@@ -637,7 +638,16 @@ index a6c2743..a03472b 100644
  
  // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
  
-@@ -87,7 +90,11 @@ void printSourceFileAndLine
+@@ -46,6 +49,8 @@ string pOpen(const string &cmd, label line=0)
+ {
+     const int MAX = 1000;
+ 
++    return cmd;
++
+     FILE *cmdPipe = popen(cmd.c_str(), "r");
+ 
+     if (cmdPipe)
+@@ -87,7 +92,11 @@ void printSourceFileAndLine
  {
      word myAddress = address;
  
@@ -649,7 +659,7 @@ index a6c2743..a03472b 100644
      {
          // Convert offset into .so into offset into executable.
  
-@@ -98,7 +105,7 @@ void printSourceFileAndLine
+@@ -98,7 +107,7 @@ void printSourceFileAndLine
  
          dladdr(addr, &info);
  
@@ -658,7 +668,7 @@ index a6c2743..a03472b 100644
  
          IStringStream addressStr(address.substr(2));
          label addressValue = readHexLabel(addressStr);
-@@ -114,7 +121,11 @@ void printSourceFileAndLine
+@@ -114,7 +123,11 @@ void printSourceFileAndLine
      {
          string line = pOpen
          (
@@ -670,7 +680,7 @@ index a6c2743..a03472b 100644
            + filename
            + " "
            + myAddress,
-@@ -153,7 +164,11 @@ void getSymbolForRaw
+@@ -153,7 +166,11 @@ void getSymbolForRaw
      {
          string fcnt = pOpen
          (
@@ -682,7 +692,7 @@ index a6c2743..a03472b 100644
            + filename
            + " "
            + address
-@@ -168,6 +183,102 @@ void getSymbolForRaw
+@@ -168,6 +185,102 @@ void getSymbolForRaw
      os << "Uninterpreted: " << raw.c_str();
  }
  
@@ -886,29 +896,35 @@ index d57f59c..0382b91 100644
          tmp<GeoField> tsubfld = subsetter.interpolate(fld);
  
 diff --git a/wmake/Makefile b/wmake/Makefile
-index 28b7015..a98f1a9 100644
+index 28b7015..0f76ee5 100644
 --- a/wmake/Makefile
 +++ b/wmake/Makefile
-@@ -93,7 +93,19 @@ EXE_DEP         = $(OBJECTS_DIR)/options
+@@ -93,7 +93,11 @@ EXE_DEP         = $(OBJECTS_DIR)/options
  LIB             = libNULL
  
  # Shared library extension
-+ifeq ($(WM_ARCH),darwinPpc)
-+SO              = dylib
-+else
-+ifeq ($(WM_ARCH),darwinIntel)
-+SO              = dylib
-+else
-+ifeq ($(WM_ARCH),darwinIntel64)
++ifeq ($(WM_ARCH_BASE),darwin)
 +SO              = dylib
 +else
  SO              = so
 +endif
-+endif
-+endif
  
  # Project executable
  EXE             = $(WM_PROJECT).out
+@@ -171,8 +175,13 @@ libso:   $(LIB).$(SO)
+ $(LIB).$(SO): $(OBJECTS)
+ 	     @$(WM_SCRIPTS)/mkObjectDir $(LIB)
+ 	     @rm -f so_locations
++ifeq ($(WM_ARCH_BASE),darwin)
++	     @cd $(OBJECTS_DIR) ; \
++	     $(LINKLIBSO) $(LOCAL_OBJECTS) -L$(LIB_WM_OPTIONS_DIR) $(LIB_LIBS) $(GLIB_LIBS) -install_name $(notdir $(LIB)).$(SO) -o $(LIB).$(SO)
++else
+ 	     @cd $(OBJECTS_DIR) ; \
+ 	     $(LINKLIBSO) $(LOCAL_OBJECTS) -L$(LIB_WM_OPTIONS_DIR) $(LIB_LIBS) $(GLIB_LIBS) -o $(LIB).$(SO)
++endif
+ 
+ lib:     $(LIB).a
+ 	     @echo \'$(LIB).a\' is up to date.
 diff --git a/wmake/rules/darwinIntel/X b/wmake/rules/darwinIntel/X
 new file mode 100644
 index 0000000..bed8bfe
